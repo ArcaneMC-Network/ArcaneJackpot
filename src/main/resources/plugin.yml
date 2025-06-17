@@ -1,0 +1,5 @@
+name: ArcaneJackpot
+version: '1.0'
+main: it.arcanemc.ArcaneJackpot
+depend:
+  - Vault

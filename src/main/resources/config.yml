@@ -1,0 +1,23 @@
+timer:
+  reminder: "30s"
+  phases:
+    sleeping: "5m"
+    purchasing: "5m"
+    winning: "10s"
+
+
+ticket-cost: 1000.0
+min-player: 5
+
+tax:
+  enabled: true
+  percentage: 10.0
+  permission: "arcanejackpot.vip"
+
+eco-format:
+  enabled: true
+  decimals: 1
+  values:
+    k: "K"
+    m: "M"
+    b: "B"
