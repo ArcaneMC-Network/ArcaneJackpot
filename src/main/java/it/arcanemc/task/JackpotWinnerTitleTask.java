@@ -36,9 +36,7 @@ public class JackpotWinnerTitleTask extends BukkitRunnable {
         this.fadeOut = config.getInt("fade-out");
     }
 
-    public void start(Player player, double jackpotAmount) {
-        this.winner = player;
-        this.jackpotAmount = jackpotAmount;
+    public void start() {
         this.currentStep = 0;
 
         this.runTaskTimer(pl, 0L, interval);
@@ -61,9 +59,8 @@ public class JackpotWinnerTitleTask extends BukkitRunnable {
 
         if (currentStep > steps) {
             String finalTitle = Colors.translate(config.getString("title"));
-            String finalSubtitle = Colors.translate(config.getString("title")
+            String finalSubtitle = Colors.translate(config.getString("subtitle")
                     .replace("{money}", df.format(jackpotAmount)));
-            TitleAPI.clearTitle(winner);
             TitleAPI.sendTitle(winner, 0, 0, fadeOut, finalTitle, finalSubtitle);
             cancel();
             return;
@@ -73,12 +70,11 @@ public class JackpotWinnerTitleTask extends BukkitRunnable {
 
         String title = Colors.translate(config.getString("title"));
         String subtitle = Colors.translate(config.getString("subtitle")
-                .replace("{money}", df.format(displayAmount)));
+                .replace("{money}", String.valueOf((int) displayAmount)));
 
         int actualFadeIn = (currentStep < fadeIn) ? fadeIn : 0;
 
-        TitleAPI.clearTitle(winner);
-        TitleAPI.sendTitle(winner, actualFadeIn, interval, 0, title, subtitle);
+        TitleAPI.sendTitle(winner, actualFadeIn, interval*2, 0, title, subtitle);
 
         currentStep++;
     }

@@ -23,7 +23,7 @@ import java.util.*;
 public class JackpotManager {
     private final ArcanePlugin pl;
     private final Economy economy;
-    private final JackpotWinnerTitleTask winnerTitle;
+    private JackpotWinnerTitleTask winnerTitle;
 
     private double ticketCost;
     private Tax tax;
@@ -112,7 +112,7 @@ public class JackpotManager {
 
         if (offlinePlayer.isOnline()){
             if (pl.getConfigurationManager().get("config").getBoolean("winner.title.enabled")) {
-                winnerTitle.start(offlinePlayer.getPlayer(), payout);
+                new JackpotWinnerTitleTask(pl, offlinePlayer.getPlayer(), payout).start();
             }
         }
         Msg.all(message);
