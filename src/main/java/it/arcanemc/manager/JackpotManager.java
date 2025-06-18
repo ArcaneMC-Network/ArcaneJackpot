@@ -3,6 +3,7 @@ package it.arcanemc.manager;
 import it.arcanemc.ArcanePlugin;
 import it.arcanemc.data.JackpotTime;
 import it.arcanemc.data.Tax;
+import it.arcanemc.task.JackpotWinnerTitleTask;
 import it.arcanemc.util.EcoFormatter;
 import it.arcanemc.util.Msg;
 import it.arcanemc.util.Timer;
@@ -22,6 +23,7 @@ import java.util.*;
 public class JackpotManager {
     private final ArcanePlugin pl;
     private final Economy economy;
+    private final JackpotWinnerTitleTask winnerTitle;
 
     private double ticketCost;
     private Tax tax;
@@ -36,6 +38,7 @@ public class JackpotManager {
             throw new EconomyNotFoundException();
         }
         this.economy = rsp.getProvider();
+        this.winnerTitle = new JackpotWinnerTitleTask(pl, null, 0.0);
         initialize();
     }
 
@@ -64,6 +67,7 @@ public class JackpotManager {
     public void reload() {
         this.reset();
         this.pl.getConfigurationManager().reload();
+        this.winnerTitle.set(pl);
         initialize();
     }
 
@@ -105,6 +109,12 @@ public class JackpotManager {
                     .replace("{name}", offlinePlayer.getName())
                     .replace("{money}", this.getFormatted(payout));
         }
+
+        if (offlinePlayer.isOnline()){
+            if (pl.getConfigurationManager().get("config").getBoolean("winner.title.enabled")) {
+                winnerTitle.start(offlinePlayer.getPlayer(), payout);
+            }
+        }
         Msg.all(message);
     }
 
@@ -115,6 +125,10 @@ public class JackpotManager {
     }
 
     public OfflinePlayer pickWinner() {
+        if (getTotalTickets() == 0) {
+            pl.getLogger().severe("No tickets available to pick a winner.");
+            return null;
+        }
         int random = new Random().nextInt(getTotalTickets());
 
         for (Map.Entry<UUID, Integer> entry : tickets.entrySet()) {
@@ -134,7 +148,7 @@ public class JackpotManager {
         }
         OfflinePlayer p = pl.getServer().getOfflinePlayer(winner);
         double payout = this.getInitialPayout();
-        boolean isTaxed = p.getPlayer().hasPermission(tax.getName());
+        boolean isTaxed = !p.getPlayer().hasPermission(tax.getName());
         if (isTaxed) {
             payout = tax.calculate(payout);
         }
@@ -154,7 +168,7 @@ public class JackpotManager {
         } else if (jackpotTime.getState() == JackpotState.PURCHASING) {
             if (jackpotTime.remainingToWinning() == 0L){
                 jackpotTime.setState(JackpotState.WINNING);
-                if (getTotalPlayers() > getMinimumPlayer()) {
+                if (getTotalPlayers() < getMinimumPlayer()) {
                     refund();
                 } else {
                     winner = pickWinner().getUniqueId();
@@ -249,14 +263,14 @@ public class JackpotManager {
             if (currentTickets == 0) {
                 Msg.player(p.getPlayer(),
                         pl.getConfigurationManager().get("message").getString("ticket.bought")
-                                .replace("{money}", this.getFormatted(amount))
-                                .replace("{cost}", this.getFormatted(price))
+                                .replace("{amount}", this.getFormatted(amount))
+                                .replace("{money}", this.getFormatted(price))
                 );
             } else {
                 Msg.player(p.getPlayer(),
                         pl.getConfigurationManager().get("message").getString("ticket.bought-again")
-                                .replace("{money}", this.getFormatted(amount))
-                                .replace("{cost}", this.getFormatted(price))
+                                .replace("{amount}", this.getFormatted(amount))
+                                .replace("{money}", this.getFormatted(price))
                                 .replace("{total}", this.getFormatted(currentTickets + amount))
                 );
             }
@@ -271,7 +285,7 @@ public class JackpotManager {
 
     public void sendJackpotInfo(OfflinePlayer p) {
         if (this.jackpotTime.getState() == JackpotState.PURCHASING) {
-            boolean isTaxed = p.getPlayer().hasPermission(tax.getName());
+            boolean isTaxed = !p.getPlayer().hasPermission(tax.getName());
             List<String> rawMessages = pl.getConfigurationManager().get("message").getStringList("stats.purchasing");
             String[] messages;
             DecimalFormat df = new DecimalFormat("#.#");

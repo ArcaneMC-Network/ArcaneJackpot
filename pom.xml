@@ -44,6 +44,13 @@
                             <minimizeJar>true</minimizeJar>
                             <filters>
                                 <filter>
+                                    <artifact>com.github.ConnorLinfoot:TitleAPI</artifact>
+                                    <excludes>
+                                        <exclude>plugin.yml</exclude>
+                                        <exclude>config.yml</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
                                     <artifact>*:*</artifact>
                                     <excludes>
                                         <exclude>META-INF/*.SF</exclude>
@@ -52,6 +59,7 @@
                                         <exclude>module-info.class</exclude>
                                         <exclude>META-INF/versions/**</exclude>
                                         <exclude>META-INF/MANIFEST.MF</exclude>
+                                        <exclude>LICENSE.txt</exclude>
                                     </excludes>
                                 </filter>
                             </filters>
@@ -111,6 +119,11 @@
             <artifactId>VaultAPI</artifactId>
             <version>1.7</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ConnorLinfoot</groupId>
+            <artifactId>TitleAPI</artifactId>
+            <version>1.8.1</version>
         </dependency>
     </dependencies>
 </project>

@@ -18,6 +18,6 @@ public class Tax {
         if (!isEnabled) {
             return 0.0;
         }
-        return amount * (percentage / 100);
+        return amount - amount * (percentage / 100);
     }
 }

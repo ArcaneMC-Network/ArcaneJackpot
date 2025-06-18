@@ -5,9 +5,18 @@ timer:
     purchasing: "5m"
     winning: "10s"
 
+winner:
+  title:
+    enabled: true
+    title: "&6&lJACKPOT"
+    subtitle: "+{money}$"
+    steps: 500
+    interval: 1
+    fade-in: 20
+    fade-out: 20
 
 ticket-cost: 1000.0
-min-player: 5
+min-players: 5
 
 tax:
   enabled: true

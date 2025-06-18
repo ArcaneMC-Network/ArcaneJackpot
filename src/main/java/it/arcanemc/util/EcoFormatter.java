@@ -1,11 +1,8 @@
 package it.arcanemc.util;
 
-import it.arcanemc.ArcanePlugin;
 import lombok.Getter;
-import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.Map;
-import java.util.Objects;
 
 @Getter
 public class EcoFormatter {
