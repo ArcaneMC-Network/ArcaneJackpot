@@ -1,0 +1,11 @@
+enabled: true
+
+sounds:
+  ticket-purchased:
+    name: "LEVEL_UP"
+    volume: 1.0
+    pitch: 1.0
+  jackpot-win:
+    name: "LEVEL_UP"
+    volume: 1.0
+    pitch: 1.0

@@ -37,7 +37,8 @@ public final class ArcaneJackpot extends ArcanePlugin {
         return new ArrayList<>(
                 List.of(
                         "config.yml",
-                        "message.yml"
+                        "message.yml",
+                        "sound.yml"
                 )
         );
     }

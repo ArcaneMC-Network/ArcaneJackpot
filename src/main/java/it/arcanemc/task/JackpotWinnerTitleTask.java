@@ -2,6 +2,7 @@ package it.arcanemc.task;
 
 import it.arcanemc.ArcanePlugin;
 import it.arcanemc.util.Colors;
+import it.arcanemc.util.loader.SoundLoader;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -62,6 +63,11 @@ public class JackpotWinnerTitleTask extends BukkitRunnable {
             String finalSubtitle = Colors.translate(config.getString("subtitle")
                     .replace("{money}", df.format(jackpotAmount)));
             TitleAPI.sendTitle(winner, 0, 0, fadeOut, finalTitle, finalSubtitle);
+            if (pl.getConfigurationManager().get("sound").getBoolean("enabled")){
+                SoundLoader.play(winner,
+                        pl.getConfigurationManager().get("sound").getConfigurationSection("sounds.jackpot-win")
+                );
+            }
             cancel();
             return;
         }

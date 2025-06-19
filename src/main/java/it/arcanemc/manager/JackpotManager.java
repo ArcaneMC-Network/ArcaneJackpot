@@ -8,6 +8,7 @@ import it.arcanemc.util.EcoFormatter;
 import it.arcanemc.util.Msg;
 import it.arcanemc.util.Timer;
 import it.arcanemc.util.exception.EconomyNotFoundException;
+import it.arcanemc.util.loader.SoundLoader;
 import lombok.Getter;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.OfflinePlayer;
@@ -217,8 +218,8 @@ public class JackpotManager {
         return pl.getConfigurationManager().get("config").getInt("min-players");
     }
 
-    public float getTicketCost() {
-        return pl.getConfigurationManager().get("config").getInt("ticket-cost");
+    public double getTicketCost() {
+        return pl.getConfigurationManager().get("config").getDouble("ticket-cost");
     }
 
     public int getTickets(OfflinePlayer p) {
@@ -263,15 +264,20 @@ public class JackpotManager {
             if (currentTickets == 0) {
                 Msg.player(p.getPlayer(),
                         pl.getConfigurationManager().get("message").getString("ticket.bought")
-                                .replace("{amount}", this.getFormatted(amount))
+                                .replace("{amount}", String.valueOf(amount))
                                 .replace("{money}", this.getFormatted(price))
                 );
             } else {
                 Msg.player(p.getPlayer(),
                         pl.getConfigurationManager().get("message").getString("ticket.bought-again")
-                                .replace("{amount}", this.getFormatted(amount))
+                                .replace("{amount}", String.valueOf(amount))
                                 .replace("{money}", this.getFormatted(price))
-                                .replace("{total}", this.getFormatted(currentTickets + amount))
+                                .replace("{total}", String.valueOf(currentTickets + amount))
+                );
+            }
+            if (pl.getConfigurationManager().get("sound").getBoolean("enabled")){
+                SoundLoader.play(p.getPlayer(),
+                        pl.getConfigurationManager().get("sound").getConfigurationSection("sounds.ticket-purchased")
                 );
             }
 
@@ -335,7 +341,7 @@ public class JackpotManager {
             return String.valueOf(value);
         }
         ConfigurationSection section = pl.getConfigurationManager().get("config").getConfigurationSection("eco-format");
-        int decimal = section.getInt("decimal");
+        int decimal = section.getInt("decimals");
         Map<String, Object> map = section.getConfigurationSection("values").getValues(false);
         return EcoFormatter.minimal(value, map, decimal);
     }
