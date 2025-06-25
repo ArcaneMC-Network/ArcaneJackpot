@@ -22,7 +22,6 @@ public final class ArcaneJackpot extends ArcanePlugin {
     public void performInitialization() {
         this.prefix = "ArcaneJackpot";
         this.jackpotManager = new JackpotManager(this);
-        this.jackpotManager.run();
     }
 
     public List<String> getDependencyNames(){

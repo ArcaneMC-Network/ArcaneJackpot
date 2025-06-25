@@ -1,10 +1,8 @@
 package it.arcanemc.data;
 
-import it.arcanemc.ArcanePlugin;
 import it.arcanemc.manager.JackpotState;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.scheduler.BukkitRunnable;
 
 @Getter
 public class JackpotTime {
@@ -33,7 +31,7 @@ public class JackpotTime {
         if (state != JackpotState.PURCHASING){
             return -1L;
         }
-        return sleepingTime + purchasingTime - timer;
+        return purchasingTime - timer;
     }
 
     public long remainingToPurchasing(){
@@ -47,6 +45,6 @@ public class JackpotTime {
         if (state != JackpotState.WINNING){
             return -1L;
         }
-        return sleepingTime + purchasingTime + winningTime - timer;
+        return winningTime - timer;
     }
 }

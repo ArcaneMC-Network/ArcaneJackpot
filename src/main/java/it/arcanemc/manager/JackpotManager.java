@@ -11,6 +11,7 @@ import it.arcanemc.util.exception.EconomyNotFoundException;
 import it.arcanemc.util.loader.SoundLoader;
 import lombok.Getter;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -23,6 +24,7 @@ import java.util.*;
 @Getter
 public class JackpotManager {
     private final ArcanePlugin pl;
+    private BukkitRunnable task;
     private final Economy economy;
     private JackpotWinnerTitleTask winnerTitle;
 
@@ -52,9 +54,9 @@ public class JackpotManager {
         this.winner = null;
         this.jackpotTime = new JackpotTime(
                 Timer.convertVerbose(timerSection.getString("reminder")),
+                Timer.convertVerbose(timerSection.getString("phases.sleeping")),
                 Timer.convertVerbose(timerSection.getString("phases.purchasing")),
-                Timer.convertVerbose(timerSection.getString("phases.winning")),
-                Timer.convertVerbose(timerSection.getString("phases.sleeping"))
+                Timer.convertVerbose(timerSection.getString("phases.winning"))
         );
 
         this.tax = new Tax(
@@ -63,6 +65,7 @@ public class JackpotManager {
                 config.getBoolean("tax.enabled")
         );
         this.tickets = new HashMap<>();
+        start();
     }
 
     public void reload() {
@@ -162,12 +165,12 @@ public class JackpotManager {
 
     public void update() {
         if (jackpotTime.getState() == JackpotState.SLEEPING) {
-            if (jackpotTime.remainingToPurchasing() == 0L) {
+            if (jackpotTime.remainingToPurchasing() <= 0L) {
                 jackpotTime.setState(JackpotState.PURCHASING);
                 sendStart();
             }
         } else if (jackpotTime.getState() == JackpotState.PURCHASING) {
-            if (jackpotTime.remainingToWinning() == 0L){
+            if (jackpotTime.remainingToWinning() <= 0L){
                 jackpotTime.setState(JackpotState.WINNING);
                 if (getTotalPlayers() < getMinimumPlayer()) {
                     refund();
@@ -179,7 +182,7 @@ public class JackpotManager {
                 sendReminder();
             }
         } else if (jackpotTime.getState() == JackpotState.WINNING) {
-            if (jackpotTime.remainingToSleeping() == 0L){
+            if (jackpotTime.remainingToSleeping() <= 0L){
                 reset();
             }
         }
@@ -346,13 +349,26 @@ public class JackpotManager {
         return EcoFormatter.minimal(value, map, decimal);
     }
 
-    public void run(){
-        new BukkitRunnable() {
+    public BukkitRunnable run(){
+        return new BukkitRunnable() {
             @Override
             public void run() {
                 jackpotTime.addTime(1000L);
                 update();
             }
-        }.runTaskTimerAsynchronously(pl, 0L, 20L);
+        };
+    }
+
+    public void stop(){
+        if (task != null) {
+            task.cancel();
+            task = null;
+        }
+    }
+
+    public void start(){
+        stop();
+        task = run();
+        task.runTaskTimerAsynchronously(pl, 0L, 20L);
     }
 }

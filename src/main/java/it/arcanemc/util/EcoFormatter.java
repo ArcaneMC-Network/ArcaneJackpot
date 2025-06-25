@@ -8,7 +8,7 @@ import java.util.Map;
 public class EcoFormatter {
     public static String minimal(double value, Map<?, ?> map, int decimals) {
         double formattedValue;
-        String suffix = "";
+        String suffix;
 
         if (value >= 1_000_000_000) {
             formattedValue = value / 1_000_000_000;
@@ -29,5 +29,4 @@ public class EcoFormatter {
             return String.format("%." + decimals + "f%s", formattedValue, suffix);
         }
     }
-
 }
